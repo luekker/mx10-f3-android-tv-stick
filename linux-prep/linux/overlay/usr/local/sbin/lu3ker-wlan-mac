@@ -1,0 +1,18 @@
+#!/bin/sh
+# Lu3ker: give wlan0 a stable MAC derived from the H313 chip ID (SID).
+# The AIC8800 driver randomises the last two bytes of 88:00:33:77:xx:xx on every load,
+# which creates a "new" client (and breaks DHCP reservations) on every boot.
+LINK=/etc/systemd/network/10-lu3ker-wlan0.link
+SID=/sys/bus/nvmem/devices/sunxi-sid0/nvmem
+[ -r "$SID" ] || exit 0
+if [ ! -e "$LINK" ]; then
+	H=$( { head -c 16 "$SID"; printf wlan0; } | sha256sum | cut -c1-10 )
+	MAC=02:$(echo "$H" | sed 's/../&:/g; s/:$//')
+	printf '[Match]\nOriginalName=wlan0\n\n[Link]\nMACAddress=%s\n' "$MAC" > "$LINK"
+fi
+# First boot: the .link only applies when udev adds the device, so set it now as well.
+MAC=$(sed -n 's/^MACAddress=//p' "$LINK")
+if [ -e /sys/class/net/wlan0 ] && [ "$(cat /sys/class/net/wlan0/address)" != "$MAC" ]; then
+	ip link set wlan0 down && ip link set wlan0 address "$MAC"
+fi
+exit 0

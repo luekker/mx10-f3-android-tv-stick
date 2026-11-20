@@ -1,0 +1,28 @@
+diff --git a/common/image.c b/common/image.c
+index e67f439..eea1376 100644
+--- a/common/image.c
++++ b/common/image.c
+@@ -421,7 +421,8 @@ static const image_header_t *image_get_ramdisk(ulong rd_addr, uint8_t arch,
+ 	bootstage_mark(BOOTSTAGE_ID_RD_HDR_CHECKSUM);
+ 
+ 	if (!image_check_os(rd_hdr, IH_OS_LINUX) ||
+-	    !image_check_arch(rd_hdr, arch) ||
++	    /* Lu3ker: this 32-bit U-Boot boots arm64 kernels; accept AArch64 initrds too */
++	    !(image_check_arch(rd_hdr, arch) || image_check_arch(rd_hdr, IH_ARCH_ARM64)) ||
+ 	    !image_check_type(rd_hdr, IH_TYPE_RAMDISK)) {
+ 		printf("No Linux %s Ramdisk Image\n",
+ 				genimg_get_arch_name(arch));
+diff --git a/include/configs/sunxi-common.h b/include/configs/sunxi-common.h
+index fdd14c2..a6c6f40 100644
+--- a/include/configs/sunxi-common.h
++++ b/include/configs/sunxi-common.h
+@@ -310,7 +310,8 @@
+ 	"fdt_addr_r=" FDT_ADDR_R "\0" \
+ 	"scriptaddr=" SCRIPT_ADDR_R "\0" \
+ 	"pxefile_addr_r=" PXEFILE_ADDR_R "\0" \
+-	"ramdisk_addr_r=" RAMDISK_ADDR_R "\0"
++	"ramdisk_addr_r=" RAMDISK_ADDR_R "\0" \
++	"initrd_high=0xffffffff\0" /* Lu3ker: keep the initrd where it was loaded */
+ 
+ #define DFU_ALT_INFO_RAM \
+ 	"dfu_alt_info_ram=" \

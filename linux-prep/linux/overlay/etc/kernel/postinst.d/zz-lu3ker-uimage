@@ -1,0 +1,18 @@
+#!/bin/sh
+# Lu3ker: the vendor 32-bit U-Boot boots legacy uImages only, so wrap each newly
+# installed Armbian kernel as /boot/uImage (the previous one is kept as uImage.old).
+# Runs after dkms (AIC8800 modules) and initramfs-tools (uInitrd) in postinst.d order.
+set -e
+version="$1"
+image="${2:-/boot/vmlinuz-$version}"
+[ -f "$image" ] || exit 0
+# boot.cmd layout: kernel runs at 0x40200000 and must end below the vendor blob at
+# 0x43000000 (46 MiB); uInitrd sits at 0x4FF00000 below the uImage at 0x52000000 (33 MiB).
+too_big() { [ "$(stat -L -c %s "$1")" -gt "$2" ] && echo "Lu3ker: $1 exceeds $2 bytes; keeping the old uImage" >&2; }
+too_big "$image" $((0x2E00000)) && exit 1
+[ -e "/boot/uInitrd-$version" ] && too_big "/boot/uInitrd-$version" $((0x2100000)) && exit 1
+[ -f /boot/uImage ] && cp -p /boot/uImage /boot/uImage.old
+mkimage -A arm -O linux -T kernel -C none -a 0x40200000 -e 0x40200000 \
+	-n "Lu3ker $version" -d "$image" /boot/uImage.new >/dev/null
+mv /boot/uImage.new /boot/uImage
+echo "Lu3ker: /boot/uImage now wraps $version"

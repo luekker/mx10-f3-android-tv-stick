@@ -1,0 +1,50 @@
+diff --git a/common/bootm.c b/common/bootm.c
+index 5663e5c..2776998 100644
+--- a/common/bootm.c
++++ b/common/bootm.c
+@@ -269,6 +269,7 @@ int use_android_image_dtb(void)
+ int bootm_find_images(int flag, int argc, char * const argv[])
+ {
+ 	int ret;
++	__maybe_unused int err;
+ 
+ 	/* find ramdisk */
+ 	ret = boot_get_ramdisk(argc, argv, &images, IH_INITRD_ARCH,
+@@ -281,6 +282,28 @@ int bootm_find_images(int flag, int argc, char * const argv[])
+ 
+ #if IMAGE_ENABLE_OF_LIBFDT
+ #ifdef CONFIG_ARCH_SUNXI
++	/* Lu3ker: an explicit FDT argument (bootm <kernel> <initrd> <fdt>) is used as
++	 * given, as upstream does, so mainline kernels get their own device tree.
++	 * Without one, keep the vendor behaviour (U-Boot's board FDT, for Android). */
++	if (argc >= 3) {
++		ret = boot_get_fdt(flag, argc, argv, IH_ARCH_DEFAULT, &images,
++				   &images.ft_addr, &images.ft_len);
++		if (ret) {
++			puts("Could not find a valid device tree\n");
++			return 1;
++		}
++		/* CONFIG_SUNXI_FDT_ADDR skips boot_relocate_fdt(), so nothing pads this
++		 * FDT; grow it in place so /chosen and the fixups fit. */
++		err = fdt_open_into(images.ft_addr, images.ft_addr,
++				    fdt_totalsize(images.ft_addr) + 0x10000);
++		if (err) {
++			printf("Could not grow device tree: %s\n", fdt_strerror(err));
++			return 1;
++		}
++		images.ft_len = fdt_totalsize(images.ft_addr);
++		set_working_fdt_addr((ulong)images.ft_addr);
++		goto fdt_done;
++	}
+ #ifdef CONFIG_OF_SEPARATE
+ 	if (use_android_image_dtb()) {
+ 		puts("Use android image dtb fail!\n");
+@@ -298,6 +321,8 @@ int bootm_find_images(int flag, int argc, char * const argv[])
+ #ifdef CONFIG_OF_SEPARATE
+ 	sunxi_update_fdt_para_for_kernel();
+ #endif
++fdt_done:
++	;
+ #else
+ 	/* find flattened device tree */
+ 	ret = boot_get_fdt(flag, argc, argv, IH_ARCH_DEFAULT, &images,

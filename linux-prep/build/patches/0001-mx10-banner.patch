@@ -1,0 +1,26 @@
+diff --git a/include/configs/sun50iw9p1.h b/include/configs/sun50iw9p1.h
+index 6edbdf2..0cd0f65 100644
+--- a/include/configs/sun50iw9p1.h
++++ b/include/configs/sun50iw9p1.h
+@@ -41,4 +41,21 @@
+  */
+ #include <configs/sunxi-common.h>
+ 
++
++/* Lu3ker / MX10 F3 bench helper: banner printed before the autoboot countdown.
++ * Each backslash is written 4x: importing the default env strips one level and
++ * hush strips another, even inside single quotes. */
++#define CONFIG_PREBOOT \
++	"echo; " \
++	"echo '  +--------------------------------------------------+'; " \
++	"echo '  |        __          _____  __                     |'; " \
++	"echo '  |       / /   __  __|__  / / /__ ___   _____       |'; " \
++	"echo '  |      / /   / / / / /_ < / //_// _ \\\\\\\\ / ___/       |'; " \
++	"echo '  |     / /___/ /_/ /___/ // , < /  __// /           |'; " \
++	"echo '  |    /_____/\\\\\\\\__,_//____//_/|_| \\\\\\\\___//_/            |'; " \
++	"echo '  |                                                  |'; " \
++	"echo '  |  H313 - bench helper - custom U-Boot             |'; " \
++	"echo '  +--------------------------------------------------+'; " \
++	"echo"
++
+ #endif /* __CONFIG_H */

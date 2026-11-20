@@ -1,0 +1,11 @@
+# Lu3ker: this card boots via the vendor boot0 + Lu3ker U-Boot, not Armbian's.
+# The Orange Pi Zero3 u-boot package would overwrite them on upgrade (and its
+# mainline SPL cannot train this board's 1.5 GB LPDDR3), and the BSP package
+# would restore the Orange Pi identity.
+Package: linux-u-boot-orangepizero3-current armbian-bsp-cli-orangepizero3-current
+Pin: release *
+Pin-Priority: -1
+
+# Kernel, headers and DTB upgrade normally: DKMS rebuilds the AIC8800 driver,
+# etc/kernel/postinst.d/zz-lu3ker-uimage rewraps /boot/uImage (keeping uImage.old),
+# and the board DTB lives in /boot/lu3ker, outside Armbian's versioned dtb dir.

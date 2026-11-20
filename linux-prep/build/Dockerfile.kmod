@@ -1,0 +1,5 @@
+# Native arm64 module builds for Armbian trixie kernels (same gcc 14.2.0 as the kernel).
+FROM --platform=linux/arm64 debian:trixie
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      build-essential bc flex bison libssl-dev libelf-dev patch kmod ca-certificates \
+    && rm -rf /var/lib/apt/lists/*

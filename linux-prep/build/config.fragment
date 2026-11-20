@@ -1,0 +1,15 @@
+# MX10: compile out the USB flashing paths (burn / efex / fastboot). The card-flashing
+# "sprite" code stays: the eMMC driver links against it, and it only runs when the
+# boot0 header's work_mode is card-product/update (ours is 0 = normal boot).
+# CONFIG_SUNXI_BURN is not set
+# CONFIG_CMD_SUNXI_BURN is not set
+# CONFIG_SUNXI_EFEX is not set
+# CONFIG_CMD_SUNXI_EFEX is not set
+# CONFIG_SUNXI_FASTBOOT is not set
+# CONFIG_CMD_FASTBOOT is not set
+CONFIG_BOOTDELAY=3
+CONFIG_IDENT_STRING=" H313 - bench helper"
+CONFIG_LOCALVERSION="-lu3ker"
+CONFIG_SYS_PROMPT="Lu3ker# "
+# Stock probes AXP152 first, then finds the AXP1530; Zero2 config drops it and the PMU is never found.
+CONFIG_SUNXI_AXP152_POWER=y

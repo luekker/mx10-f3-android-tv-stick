@@ -1,0 +1,24 @@
+diff --git a/src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.c b/src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.c
+index 83f45cb..2451b9a 100644
+--- a/src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.c
++++ b/src/SDIO/driver_fw/driver/aic8800/aic8800_bsp/aicsdio.c
+@@ -1817,7 +1817,8 @@ int aicwf_sdio_func_init(struct aic_sdio_dev *sdiodev)
+     udelay(100);
+ #if 1//SDIO CLOCK SETTING
+ 	if (feature.sdio_clock > 0) {
+-		host->ios.clock = feature.sdio_clock;
++		/* Lu3ker: never exceed the host's max-frequency (DT); set_ios() bypasses the core's cap */
++		host->ios.clock = min_t(unsigned int, feature.sdio_clock, host->f_max);
+ 		host->ops->set_ios(host, &host->ios);
+ 		sdio_dbg("Set SDIO Clock %d MHz\n", host->ios.clock/1000000);
+ 	}
+@@ -1937,7 +1938,8 @@ int aicwf_sdiov3_func_init(struct aic_sdio_dev *sdiodev)
+     msleep(1);
+ #if 1//SDIO CLOCK SETTING
+ 	if ((feature.sdio_clock > 0) && (host->ios.timing != MMC_TIMING_UHS_DDR50)) {
+-		host->ios.clock = feature.sdio_clock;
++		/* Lu3ker: never exceed the host's max-frequency (DT); set_ios() bypasses the core's cap */
++		host->ios.clock = min_t(unsigned int, feature.sdio_clock, host->f_max);
+ 		host->ops->set_ios(host, &host->ios);
+ 		sdio_dbg("Set SDIO Clock %d MHz\n", host->ios.clock/1000000);
+ 	}

@@ -1,0 +1,22 @@
+# Inputs and outputs that are not published (see README: "What's not in this repo")
+.DS_Store
+backup/
+apks/**/*.apk
+apks/**/oat/
+linux-prep/u-boot-sun50iw9/
+linux-prep/vendor-src/
+linux-prep/kernel-headers/
+linux-prep/build/out/
+linux-prep/build/*.log
+linux-prep/linux/dkms/
+linux-prep/linux/modules/
+linux-prep/armbian/*.img
+linux-prep/armbian/*.img.xz
+linux-prep/armbian/dtb/
+linux-prep/images/*.img
+linux-prep/images/*.bin
+linux-prep/bootchain/*.bin
+linux-prep/aic8800d80/*.bin
+linux-prep/aic8800d80/*.ko
+linux-prep/aic8800d80/aic_userconfig.txt
+linux-prep/device.dtb

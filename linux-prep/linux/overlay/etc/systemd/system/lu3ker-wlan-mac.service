@@ -1,0 +1,12 @@
+[Unit]
+Description=Lu3ker: stable WiFi MAC from the chip ID
+After=systemd-modules-load.service systemd-udev-settle.service
+Before=network-pre.target systemd-networkd.service wpa_supplicant.service
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/lu3ker-wlan-mac
+
+[Install]
+WantedBy=network-pre.target

@@ -1,0 +1,19 @@
+[Unit]
+Description=Lu3ker: attach AIC8800D80 Bluetooth (H4 on UART1)
+# The BT patch is loaded by aic8800_bsp while the WiFi driver initialises the chip,
+# so wait for wlan0. Wanted by multi-user.target: bluetooth.target is only pulled in by
+# udev once hci0 exists, which is what this unit creates.
+After=systemd-modules-load.service lu3ker-wlan-mac.service
+Before=bluetooth.service
+Wants=bluetooth.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/bin/sh -c 'for i in $(seq 30); do [ -e /sys/class/net/wlan0 ] && exit 0; sleep 1; done; exit 1'
+ExecStart=/usr/local/sbin/lu3ker-bt-attach
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
